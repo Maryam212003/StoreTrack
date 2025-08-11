@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["StoreTrack"]
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  description String?
+  parentId    Int?       // Nullable for top-level categories
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+
+  @@map("category")
+  @@schema("StoreTrack")
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  stock       Int       @default(0)
+  price       Float
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+  histories   StockHistory[]
+  orderItems  OrderItem[]
+  thruDate    DateTime?  // null means active
+
+
+  @@map("product")
+  @@schema("StoreTrack")
+}
+
+model StockHistory {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  date       DateTime @default(now())
+  type       StockMovementType
+
+  @@map("stock_history")
+  @@schema("StoreTrack")
+}
+
+enum StockMovementType {
+  IN   // ورود (stock added)
+  OUT  // خروج (stock removed)
+
+  @@schema("StoreTrack")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  status      OrderStatus @default(PENDING)
+  date        DateTime    @default(now())
+  totalValue  Float
+  totalItems  Int
+  orderItems  OrderItem[]
+
+  @@map("order")
+  @@schema("StoreTrack")
+}
+
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  CANCELED
+
+  @@schema("StoreTrack")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+
+  @@map("order_item")
+  @@schema("StoreTrack")
+}
