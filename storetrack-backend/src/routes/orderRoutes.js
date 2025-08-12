@@ -148,5 +148,57 @@ router.post('/search', async (req, res) => {
   }
 });
 
+/**
+ * Cancel Order (return stock)
+ */
+router.patch('/:id/cancel', async (req, res) => {
+  try {
+    // Find order with items
+    const order = await prisma.order.findUnique({
+      where: { id: parseInt(req.params.id) },
+      include: { items: true }
+    });
+
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    if (order.status === 'CANCELED') {
+      return res.status(400).json({ error: 'Order already canceled' });
+    }
+    
+
+    // Return stock for each product
+    for (const item of order.items) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } }
+      });
+
+      // Add stock history
+      await prisma.stockHistory.create({
+        data: {
+          productId: item.productId,
+          date: new Date(),
+          type: 'IN',
+          quantity: item.quantity
+        }
+      });
+    }
+
+    // Update order status
+    const updatedOrder = await prisma.order.update({
+      where: { id: order.id },
+      data: { status: 'CANCELED' },
+      include: { items: { include: { product: true } } }
+    });
+
+    res.json({
+      message: 'Order canceled and stock returned',
+      order: updatedOrder
+    });
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    res.status(500).json({ error: 'Failed to cancel order' });
+  }
+});
 
 export default router;
