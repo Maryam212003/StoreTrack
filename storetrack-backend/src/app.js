@@ -3,7 +3,7 @@ import prisma from './prisma/prismaClient.js';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import stockHistoryRoutes from './routes/stockHistoryRoutes.js';
-
+import orderRoutes from './routes/orderRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/stockHistory', stockHistoryRoutes);
+app.use('/orders', orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
