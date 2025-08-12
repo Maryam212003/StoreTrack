@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoreTrack</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="storetrack.css">
+</head>
+<body>
+    <header class="app-header">
+        <a href="../index.html" class="back-btn">بازگشت</a>
+        <span class="title">StoreTrack</span>
+        <div></div>
+    </header>
+    <div class="app-container">
+        <div class="box-panel">
+            <h3>مدیریت کالا</h3>
+            <form id="add-product-form">
+                <div class="form-group">
+                    <label for="product-name">نام کالا</label>
+                    <input type="text" id="product-name" placeholder="نام کالا" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-price">قیمت</label>
+                    <input type="number" id="product-price" placeholder="قیمت" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-quantity">موجودی</label>
+                    <input type="number" id="product-quantity" placeholder="موجودی" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-category">دسته بندی</label>
+                    <input type="text" id="product-category" placeholder="دسته بندی">
+                </div>
+                <button type="submit" class="main-btn primary-btn full-width">افزودن کالا</button>
+            </form>
+        </div>
+
+        <div class="box-panel">
+            <h3>ثبت سفارش جدید</h3>
+            <form id="add-order-form">
+                <div class="form-group">
+                    <label for="customer-name">نام مشتری</label>
+                    <input type="text" id="customer-name" placeholder="نام مشتری" required>
+                </div>
+                <div class="form-group">
+                    <label for="ordered-product-id">شناسه کالا</label>
+                    <input type="text" id="ordered-product-id" placeholder="شناسه کالا" required>
+                </div>
+                <div class="form-group">
+                    <label for="ordered-quantity">تعداد</label>
+                    <input type="number" id="ordered-quantity" placeholder="تعداد" required min="1">
+                </div>
+                <button type="submit" class="main-btn primary-btn full-width">ثبت سفارش</button>
+            </form>
+        </div>
+
+        <div class="box-panel list-panel">
+            <h3>لیست کالاها</h3>
+            <input type="text" id="product-filter" placeholder="جستجو کالا..." class="search-input">
+            <button id="show-low-stock" class="main-btn secondary-btn full-width">نمایش موجودی کم</button>
+            <div id="product-list" class="product-list"></div>
+        </div>
+
+        <div class="box-panel list-panel">
+            <h3>سفارشات</h3>
+            <input type="text" id="order-filter" placeholder="جستجو سفارش..." class="search-input">
+            <div id="order-list" class="order-list"></div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="history-product-name">تاریخچه کالا</h3>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </div>
+    <script src="storetrack.js"></script>
+</body>
+</html>
