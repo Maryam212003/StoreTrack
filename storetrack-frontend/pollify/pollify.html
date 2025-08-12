@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollify</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="pollify.css">
+</head>
+<body>
+    <header class="app-header">
+        <a href="../index.html" class="back-btn">بازگشت</a>
+        <span class="title">Pollify</span>
+        <div></div>
+    </header>
+
+    <div class="app-container">
+        <div id="main-panel" class="box-panel">
+            <h3>نظرسنجی‌های من</h3>
+            <div id="poll-list-container">
+                <ul id="poll-list" class="poll-list"></ul>
+            </div>
+            <button id="show-create-poll-btn" class="main-btn primary-btn full-width">ساخت نظرسنجی جدید</button>
+        </div>
+
+        <div id="create-panel" class="box-panel pollify-panel" style="display: none;">
+            <div class="panel-header">
+                <h2 id="pollify-title">ساخت نظرسنجی جدید</h2>
+                <button type="button" class="main-btn secondary-btn" onclick="showMainPanel()">بازگشت</button>
+            </div>
+            <form id="poll-form">
+                <div class="form-group">
+                    <label for="poll-title">عنوان نظرسنجی</label>
+                    <input type="text" id="poll-title" placeholder="عنوان را وارد کنید" required>
+                </div>
+                <div class="form-group">
+                    <label for="poll-settings">تنظیمات</label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="one-response-limit">
+                        محدودیت پاسخ (هر کاربر یکبار)
+                    </label>
+                </div>
+                <div id="questions-container" class="questions-container"></div>
+                <div class="form-actions">
+                    <button type="button" id="add-question-btn" class="main-btn secondary-btn">افزودن سوال</button>
+                    <button type="submit" class="main-btn primary-btn">ذخیره نظرسنجی</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="results-panel" class="box-panel" style="display: none;">
+            <div class="panel-header">
+                <h3 id="results-poll-title"></h3>
+                <button type="button" class="main-btn secondary-btn" onclick="showMainPanel()">بازگشت به نظرسنجی‌ها</button>
+            </div>
+            <div id="results-content">
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <h4>تعداد پاسخ‌ها</h4>
+                        <span id="response-count" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div id="chart-container" class="chart-container"></div>
+            </div>
+            <button id="export-csv" class="main-btn secondary-btn" style="margin-top: 2rem;">خروجی CSV</button>
+        </div>
+
+        <div id="response-panel" class="box-panel" style="display: none;">
+            <div class="panel-header">
+                <h3 id="response-poll-title"></h3>
+                <button type="button" class="main-btn secondary-btn" onclick="showMainPanel()">بازگشت</button>
+            </div>
+            <form id="response-form">
+                <div id="response-questions-container"></div>
+                <div class="form-actions">
+                    <button type="submit" class="main-btn primary-btn">ثبت پاسخ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="pollify.js"></script>
+</body>
+</html>
