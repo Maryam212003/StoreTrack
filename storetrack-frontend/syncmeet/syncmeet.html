@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncMeet</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="syncmeet.css">
+</head>
+<body>
+    <header class="app-header">
+        <a href="../index.html" class="back-btn">بازگشت</a>
+        <span class="title">SyncMeet</span>
+        <div></div>
+    </header>
+    <div class="app-container">
+        <!-- پنل تعریف جلسه جدید -->
+        <div class="box-panel">
+            <h3>تعریف جلسه جدید</h3>
+            <form id="create-meeting-form">
+                <div class="form-group">
+                    <label for="meeting-title">عنوان جلسه</label>
+                    <input type="text" id="meeting-title" placeholder="عنوان" required>
+                </div>
+                <div class="form-group">
+                    <label for="meeting-time">زمان و تاریخ</label>
+                    <input type="datetime-local" id="meeting-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="meeting-duration">مدت زمان (دقیقه)</label>
+                    <input type="number" id="meeting-duration" value="60" min="15" step="15">
+                </div>
+                <div class="form-group">
+                    <label for="meeting-description">توضیحات</label>
+                    <textarea id="meeting-description" placeholder="توضیحات جلسه"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="meeting-invitees">دعوت شرکت‌کنندگان (ایمیل‌ها، با کاما جدا کنید)</label>
+                    <input type="text" id="meeting-invitees" placeholder="مثال: email1@example.com, email2@example.com">
+                </div>
+                <button type="submit" class="main-btn primary-btn full-width">ذخیره جلسه</button>
+            </form>
+        </div>
+
+        <!-- پنل تقویم -->
+        <div class="box-panel calendar-panel">
+            <h3>تقویم جلسات</h3>
+            <div class="calendar-header">
+                <button id="prev-month-btn" class="main-btn secondary-btn">ماه قبل</button>
+                <h4 id="current-month-year"></h4>
+                <button id="next-month-btn" class="main-btn secondary-btn">ماه بعد</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                <!-- Days of the week header -->
+                <div class="day-name">ش</div>
+                <div class="day-name">ی</div>
+                <div class="day-name">د</div>
+                <div class="day-name">س</div>
+                <div class="day-name">چ</div>
+                <div class="day-name">پ</div>
+                <div class="day-name">ج</div>
+                <!-- Calendar days will be generated here -->
+            </div>
+        </div>
+
+        <!-- پنل جلسات آینده -->
+        <div class="box-panel">
+            <h3>جلسات آینده</h3>
+            <div id="upcoming-meetings-list" class="meeting-list"></div>
+        </div>
+
+        <!-- پنل جلسات آرشیو شده -->
+        <div class="box-panel">
+            <h3>جلسات آرشیو شده</h3>
+            <div id="archived-meetings-list" class="meeting-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Meeting Details -->
+    <div id="meeting-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modal-meeting-title"></h3>
+            <p><strong>زمان:</strong> <span id="modal-meeting-time"></span></p>
+            <p><strong>مدت زمان:</strong> <span id="modal-meeting-duration"></span> دقیقه</p>
+            <p><strong>توضیحات:</strong> <span id="modal-meeting-description"></span></p>
+            
+            <h4>شرکت‌کنندگان:</h4>
+            <ul id="modal-invitee-list" class="invitee-list"></ul>
+
+            <div class="modal-actions">
+                <button id="rsvp-accept-btn" class="main-btn primary-btn">شرکت می‌کنم</button>
+                <button id="rsvp-decline-btn" class="main-btn secondary-btn">شرکت نمی‌کنم</button>
+                <button id="archive-meeting-btn" class="main-btn secondary-btn">آرشیو جلسه</button>
+                <button id="delete-meeting-btn" class="main-btn secondary-btn">حذف جلسه</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="syncmeet.js"></script>
+</body>
+</html>
