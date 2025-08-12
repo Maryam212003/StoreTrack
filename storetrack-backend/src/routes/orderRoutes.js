@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * Create Order
  */
-router.post('/', async (req, res) => {
+router.post('/newOredr/', async (req, res) => {
   const { items, status } = req.body;
 
   try {
@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
 /**
  * Get All Orders
  */
-router.get('/', async (req, res) => {
+router.get('/getAll/', async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
       include: { items: { include: { product: true } } }
@@ -92,7 +92,7 @@ router.get('/', async (req, res) => {
 /**
  * Get Single Order
  */
-router.get('/:id', async (req, res) => {
+router.get('/getById/:id', async (req, res) => {
   try {
     const order = await prisma.order.findUnique({
       where: { id: parseInt(req.params.id) },
@@ -108,7 +108,7 @@ router.get('/:id', async (req, res) => {
 /**
  * Update Order Status
  */
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/updateStatus', async (req, res) => {
   const { status } = req.body;
   try {
     const updated = await prisma.order.update({
@@ -151,7 +151,7 @@ router.post('/search', async (req, res) => {
 /**
  * Cancel Order (return stock)
  */
-router.patch('/:id/cancel', async (req, res) => {
+router.patch('/:id/cancelOrder', async (req, res) => {
   try {
     // Find order with items
     const order = await prisma.order.findUnique({
