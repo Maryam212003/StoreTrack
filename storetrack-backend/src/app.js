@@ -7,6 +7,8 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import stockHistoryRoutes from './routes/stockHistoryRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import orderItemRoutes from './routes/orderItemRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+
 
 const app = express();
 
@@ -23,5 +25,7 @@ app.use('/categories', categoryRoutes);
 app.use('/stockHistory', stockHistoryRoutes);
 app.use('/orders', orderRoutes);
 app.use('/order-items', orderItemRoutes);
+app.use('/reports', reportRoutes);
+
 
 export default app;
