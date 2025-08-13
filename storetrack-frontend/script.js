@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (orderItems.length === 0) return alert('سفارش باید حداقل یک قلم کالا داشته باشد.');
 
         try {
-            await fetch(`${API_BASE_URL}/orders/newOredr`, {
+            await fetch(`${API_BASE_URL}/orders/newOrder`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ items: orderItems, status: 'PENDING' })

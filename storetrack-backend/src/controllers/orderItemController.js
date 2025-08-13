@@ -53,7 +53,7 @@ export const addItemToOrder = async (req, res) => {
 export const updateOrderItemQuantity = async (req, res) => {
   try {
     const { quantity } = req.body;
-    const itemId = parseInt(req.params.id);
+    const itemId = parseInt(req.params.itemId);
 
     const orderItem = await prisma.orderItem.findUnique({ where: { id: itemId } });
     if (!orderItem) return res.status(404).json({ error: 'Order item not found' });

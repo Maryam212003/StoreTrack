@@ -32,7 +32,8 @@ export const getAllProducts = async (req, res) => {
           { thruDate: { gt: now } }
         ]
       },
-      include: { category: true }
+      include: { category: true },
+      orderBy: {price:"asc"}
     });
 
     res.json(products);
@@ -62,16 +63,38 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// Update product
 export const updateProduct = async (req, res) => {
   const id = parseInt(req.params.id);
   const { name, stock, price, categoryId, thruDate } = req.body;
+
   try {
+    const existingProduct = await prisma.product.findUnique({
+      where: { id }
+    });
+
+    if (!existingProduct) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: { name, stock, price, categoryId, thruDate },
     });
+
+    if (stock !== undefined && stock !== existingProduct.stock) {
+      const quantityChange = stock - existingProduct.stock;
+      await prisma.stockHistory.create({
+        data: {
+          productId: id,
+          type: quantityChange > 0 ? 'IN' : 'OUT',
+          quantity: Math.abs(quantityChange),
+          date: new Date()
+        }
+      });
+    }
+
     res.json(updatedProduct);
+
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(500).json({ error: 'Internal server error' });

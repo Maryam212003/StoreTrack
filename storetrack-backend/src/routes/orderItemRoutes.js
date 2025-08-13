@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.post('/addItem', addItemToOrder);
-router.put('/updateQuantity/:id', updateOrderItemQuantity);
+router.put('/updateQuantity/:itemId', updateOrderItemQuantity);
 router.delete('/removeItem/:id', removeItemFromOrder);
 router.get('/order/:orderId', getOrderItems);
 
