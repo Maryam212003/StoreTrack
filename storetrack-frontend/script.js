@@ -139,16 +139,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCategories() {
         const categorySelects = document.querySelectorAll('#product-category, #category-filter');
+
         categorySelects.forEach(select => {
             select.innerHTML = '<option value="">همه دسته‌بندی‌ها</option>';
             state.categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.description;
-                select.appendChild(option);
+                appendCategoryOption(select, category);
             });
         });
     }
+
+    function appendCategoryOption(select, category, level = 0) {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = `${'— '.repeat(level)}${category.description}`;
+        select.appendChild(option);
+
+        if (category.children && category.children.length > 0) {
+            category.children.forEach(child => appendCategoryOption(select, child, level + 1));
+        }
+    }
+
     
     function renderOrders(ordersToRender = state.orders) {
         ordersList.innerHTML = '';

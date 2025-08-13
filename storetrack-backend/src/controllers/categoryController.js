@@ -1,15 +1,40 @@
 import prisma from '../prisma/prismaClient.js';
 
-// GET all categories (with children)
+async function getCategoryWithChildren(id) {
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: { children: true },
+  });
+
+  if (!category) return null;
+
+  // Recursively fetch each child's children
+  const childrenWithNested = [];
+  for (const child of category.children) {
+    const nestedChild = await getCategoryWithChildren(child.id);
+    if (nestedChild) childrenWithNested.push(nestedChild);
+  }
+
+  return { ...category, children: childrenWithNested };
+}
+
+// Get all categories
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await prisma.category.findMany({
-      include: { children: true }
+    const topCategories = await prisma.category.findMany({
+      where: { parentId: null },
     });
-    res.json(categories);
+
+    const fullTree = [];
+    for (const cat of topCategories) {
+      const nestedCat = await getCategoryWithChildren(cat.id);
+      if (nestedCat) fullTree.push(nestedCat);
+    }
+
+    res.json(fullTree);
   } catch (error) {
     console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 };
 
