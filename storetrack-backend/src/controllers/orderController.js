@@ -64,7 +64,11 @@ export const createOrder = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { items: { include: { product: true } } }
+      include: 
+      { items: 
+        { include: 
+          { product: true } } },
+      orderBy: { date: 'desc' }
     });
     res.json(orders);
   } catch (error) {
@@ -144,6 +148,9 @@ export const cancelOrder = async (req, res) => {
     if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.status === 'CANCELED') {
       return res.status(400).json({ error: 'Order already canceled' });
+    }
+    if (order.status === 'SHIPPED') {
+      return res.status(400).json({ error: 'Order shipped.' });
     }
 
     for (const item of order.items) {
