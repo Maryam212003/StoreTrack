@@ -42,6 +42,7 @@ model StockHistory {
   product    Product  @relation(fields: [productId], references: [id])
   date       DateTime @default(now())
   type       StockMovementType
+  quantity   Int @default(1)
 
   @@map("stock_history")
   @@schema("StoreTrack")
@@ -60,7 +61,7 @@ model Order {
   date        DateTime    @default(now())
   totalValue  Float
   totalItems  Int
-  orderItems  OrderItem[]
+  items  OrderItem[]
 
   @@map("order")
   @@schema("StoreTrack")
@@ -81,6 +82,7 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
+  price     Float //Price at the time of order
 
   @@map("order_item")
   @@schema("StoreTrack")

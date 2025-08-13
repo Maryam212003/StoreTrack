@@ -1,2 +1,4 @@
 npx prisma generate
 npx prisma migrate dev --name init
+
+maryam@maryam-Lenovo:~/Desktop/IE_Project/storetrack-backend$ node src/jobs/testEmail.js
