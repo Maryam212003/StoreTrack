@@ -52,7 +52,7 @@ async function checkLowStockAndNotify() {
 }
 
 // Schedule job to run every day at 6:00 AM
-cron.schedule('54 11 * * *', checkLowStockAndNotify, {
+cron.schedule('0 6 * * *', checkLowStockAndNotify, {
   timezone: "Asia/Tehran" // Change to your timezone
 });
 
