@@ -3,45 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد پروژه</title>
+    <title>StoreTrack - مدیریت انبار و فروش</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        <main class="dashboard-container">
-            <div class="dashboard-card">
-                <h1 class="dashboard-title">به پروژه خود خوش آمدید!</h1>
-                <p class="dashboard-subtitle">لطفاً بخش مورد نظر خود را انتخاب کنید:</p>
-                <div class="project-options-grid">
-                    <a href="worknest/worknest.html" class="option-card primary-bg">
-                        <span class="card-icon">🏗️</span>
-                        <h2 class="card-title">WorkNest</h2>
-                        <p class="card-subtitle">مدیریت پروژه و چت</p>
-                    </a>
-                    <a href="pollify/pollify.html" class="option-card success-bg">
-                        <span class="card-icon">📝</span>
-                        <h2 class="card-title">Pollify</h2>
-                        <p class="card-subtitle">سیستم نظرسنجی و تحلیل</p>
-                    </a>
-                    <a href="storetrack/storetrack.html" class="option-card warning-bg">
-                        <span class="card-icon">📦</span>
-                        <h2 class="card-title">StoreTrack</h2>
-                        <p class="card-subtitle">مدیریت انبار و سفارش</p>
-                    </a>
-                    <a href="syncmeet/syncmeet.html" class="option-card info-bg">
-                        <span class="card-icon">🗓️</span>
-                        <h2 class="card-title">SyncMeet</h2>
-                        <p class="card-subtitle">تقویم گروهی و جلسات</p>
-                    </a>
-                    <a href="vocameet/vocameet.html" class="option-card danger-bg">
-                        <span class="card-icon">🎙️</span>
-                        <h2 class="card-title">VocaMeet</h2>
-                        <p class="card-subtitle">جلسات صوتی و گزارش</p>
-                    </a>
+    <header class="header">
+        <h1 class="logo">StoreTrack</h1>
+        <nav class="nav">
+            <ul>
+                <li><a href="#dashboard" class="nav-link active" data-page="dashboard"><i class="fas fa-home"></i> داشبورد</a></li>
+                <li><a href="#products" class="nav-link" data-page="products"><i class="fas fa-box-open"></i> محصولات</a></li>
+                <li><a href="#orders" class="nav-link" data-page="orders"><i class="fas fa-shopping-cart"></i> سفارشات</a></li>
+                <li><a href="#reports" class="nav-link" data-page="reports"><i class="fas fa-chart-line"></i> گزارش‌ها</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="dashboard" class="page active">
+            <h2>داشبورد</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <i class="fas fa-box"></i>
+                    <h3>کل محصولات</h3>
+                    <p id="total-products">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>کل سفارشات</h3>
+                    <p id="total-orders">0</p>
+                </div>
+                <div class="stat-card low-stock-card">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>محصولات کم‌موجودی</h3>
+                    <p id="low-stock-count">0</p>
+                    <button class="view-low-stock-btn" onclick="showLowStockModal()">مشاهده</button>
                 </div>
             </div>
-        </main>
+            <div class="recent-activity">
+                <h3>آخرین فعالیت‌ها</h3>
+                <ul id="recent-activity-list"></ul>
+            </div>
+        </section>
+
+        <section id="products" class="page">
+            <div class="page-header">
+                <h2>مدیریت محصولات</h2>
+                <button class="btn btn-primary" onclick="showProductModal()">+ افزودن محصول جدید</button>
+            </div>
+            <div class="filter-container">
+                <input type="text" id="product-search" placeholder="جستجو بر اساس نام محصول...">
+                <select id="category-filter">
+                    <option value="">همه دسته‌بندی‌ها</option>
+                </select>
+                <button class="btn" onclick="filterProducts()"><i class="fas fa-search"></i> جستجو</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>نام محصول</th>
+                        <th>دسته بندی</th>
+                        <th>موجودی</th>
+                        <th>قیمت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list"></tbody>
+            </table>
+        </section>
+
+        <section id="orders" class="page">
+            <div class="page-header">
+                <h2>مدیریت سفارشات</h2>
+                <button class="btn btn-primary" onclick="showOrderModal()">+ ثبت سفارش جدید</button>
+            </div>
+            <div class="filter-container">
+                <input type="date" id="order-start-date">
+                <input type="date" id="order-end-date">
+                <select id="order-status-filter">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="PENDING">در انتظار</option>
+                    <option value="SHIPPED">ارسال شده</option>
+                    <option value="CANCELED">لغو شده</option>
+                </select>
+                <button class="btn" onclick="filterOrders()"><i class="fas fa-search"></i> جستجو</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>شناسه سفارش</th>
+                        <th>تاریخ</th>
+                        <th>تعداد اقلام</th>
+                        <th>مجموع مبلغ</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-list"></tbody>
+            </table>
+        </section>
+        
+        <section id="reports" class="page">
+            <h2>گزارش‌ها</h2>
+            <div class="report-section">
+                <h3>گزارش فروش</h3>
+                <div class="chart-container">
+                    <canvas id="sales-chart"></canvas>
+                </div>
+            </div>
+            <div class="report-section">
+                <h3>تاریخچه موجودی</h3>
+                <div class="filter-container">
+                    <input type="number" id="history-product-id" placeholder="شناسه محصول">
+                    <select id="history-type-filter">
+                        <option value="">همه انواع</option>
+                        <option value="IN">ورودی</option>
+                        <option value="OUT">خروجی</option>
+                    </select>
+                    <input type="date" id="history-start-date">
+                    <input type="date" id="history-end-date">
+                    <button class="btn" onclick="filterStockHistory()"><i class="fas fa-search"></i> فیلتر</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>تاریخ</th>
+                            <th>شناسه محصول</th>
+                            <th>نوع</th>
+                            <th>تعداد</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-history-list"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('product-modal')">&times;</span>
+            <h2 id="product-modal-title">افزودن محصول جدید</h2>
+            <form id="product-form">
+                <label for="product-name">نام محصول:</label>
+                <input type="text" id="product-name" required>
+                <label for="product-stock">موجودی:</label>
+                <input type="number" id="product-stock" required>
+                <label for="product-price">قیمت:</label>
+                <input type="number" id="product-price" step="0.01" required>
+                <label for="product-category">دسته بندی:</label>
+                <select id="product-category" required></select>
+                <button type="submit" class="btn btn-primary" id="save-product-btn">ذخیره</button>
+                <input type="hidden" id="product-id">
+            </form>
+        </div>
     </div>
+    
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('order-modal')">&times;</span>
+            <h2>ثبت سفارش جدید</h2>
+            <form id="order-form">
+                <div class="order-items-container">
+                    <h3>اقلام سفارش</h3>
+                    <div id="order-items-list"></div>
+                    <div class="add-item-row">
+                        <select id="add-order-product-select"></select>
+                        <input type="number" id="add-order-quantity" placeholder="تعداد" min="1" value="1">
+                        <button type="button" class="btn" onclick="addOrderItem()">+ اضافه کردن</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">ثبت سفارش</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="low-stock-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('low-stock-modal')">&times;</span>
+            <h2>محصولات با موجودی کم</h2>
+            <ul id="low-stock-list"></ul>
+        </div>
+    </div>
+
+    <div id="order-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('order-detail-modal')">&times;</span>
+            <h2 id="order-detail-title">جزئیات سفارش</h2>
+            <div id="order-detail-content"></div>
+            <button class="btn btn-danger" id="cancel-order-btn">لغو سفارش</button>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
