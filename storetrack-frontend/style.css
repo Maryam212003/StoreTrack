@@ -369,6 +369,70 @@ form input, form select {
     font-size: 0.8rem;
 }
 
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.report-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.report-card h3 {
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.chart-card {
+    grid-column: 1 / -1; /* Make the chart card span the full width */
+}
+
+.chart-container {
+    position: relative;
+    height: 400px; /* Fixed height for the chart */
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    text-align: right;
+    border: 1px solid var(--border-color);
+}
+
+.table thead th {
+    background-color: var(--bg-light);
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
 .status-PENDING { background-color: var(--warning-color); color: #333; }
 .status-SHIPPED { background-color: var(--success-color); }
 .status-CANCELED { background-color: var(--danger-color); }

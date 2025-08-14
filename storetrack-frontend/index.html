@@ -60,17 +60,17 @@
                 <button class="btn" onclick="filterProducts()"><i class="fas fa-search"></i> جستجو</button>
             </div>
             <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>نام محصول</th>
+                    <thead>
+                        <tr>
+                            <th>نام محصول</th>
                         <th>دسته بندی</th>
-                        <th>موجودی</th>
+                            <th>موجودی</th>
                         <th>قیمت</th>
-                        <th>عملیات</th>
-                    </tr>
-                </thead>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
                 <tbody id="products-list"></tbody>
-            </table>
+                </table>
         </section>
 
         <section id="orders" class="page">
@@ -90,58 +90,116 @@
                 <button class="btn" onclick="filterOrders()"><i class="fas fa-search"></i> جستجو</button>
             </div>
             <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>شناسه سفارش</th>
-                        <th>تاریخ</th>
-                        <th>تعداد اقلام</th>
-                        <th>مجموع مبلغ</th>
-                        <th>وضعیت</th>
-                        <th>عملیات</th>
-                    </tr>
-                </thead>
-                <tbody id="orders-list"></tbody>
-            </table>
-        </section>
-        
-        <section id="reports" class="page">
-            <h2>گزارش‌ها</h2>
-            <div class="report-section">
-                <h3>گزارش فروش</h3>
-                <div class="chart-container">
-                    <canvas id="sales-chart"></canvas>
-                </div>
-            </div>
-            <div class="report-section">
-                <h3>تاریخچه موجودی</h3>
-                <div class="filter-container">
-                    <input type="number" id="history-product-id" placeholder="شناسه محصول">
-                    <select id="history-type-filter">
-                        <option value="">همه انواع</option>
-                        <option value="IN">ورودی</option>
-                        <option value="OUT">خروجی</option>
-                    </select>
-                    <input type="date" id="history-start-date">
-                    <input type="date" id="history-end-date">
-                    <button class="btn" onclick="filterStockHistory()"><i class="fas fa-search"></i> فیلتر</button>
-                </div>
-                <table class="data-table">
                     <thead>
                         <tr>
-                            <th>تاریخ</th>
-                            <th>شناسه محصول</th>
-                            <th>نوع</th>
-                            <th>تعداد</th>
+                        <th>شناسه سفارش</th>
+                        <th>تاریخ</th>
+                            <th>تعداد اقلام</th>
+                        <th>مجموع مبلغ</th>
+                            <th>وضعیت</th>
+                            <th>عملیات</th>
                         </tr>
                     </thead>
-                    <tbody id="stock-history-list"></tbody>
+                <tbody id="orders-list"></tbody>
                 </table>
+        </section>
+
+        <section id="reports" class="page">
+            <h2>گزارش‌ها</h2>
+            <div class="reports-container">
+                <!-- Sales Report by Product -->
+                <div class="report-card mb-4">
+                    <h3>گزارش فروش بر اساس محصول</h3>
+                    <button id="fetch-sales-by-product-btn" class="btn btn-primary">دریافت گزارش</button>
+                    <div class="table-responsive mt-3">
+                        <table id="sales-by-product-table" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>نام محصول</th>
+                                    <th>تعداد فروش</th>
+                                    <th>مجموع فروش (ریال)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sales Report by Date -->
+                <div class="report-card mb-4">
+                    <h3>گزارش فروش بر اساس تاریخ</h3>
+                    <div class="form-group">
+                        <label for="start-date-input">از تاریخ:</label>
+                        <input type="date" id="start-date-input" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="end-date-input">تا تاریخ:</label>
+                        <input type="date" id="end-date-input" class="form-control">
+                    </div>
+                    <button id="fetch-sales-by-date-btn" class="btn btn-primary mt-2" onclick="fetchSalesByDate()">دریافت گزارش</button>
+                    <div class="table-responsive mt-3">
+                        <table id="sales-by-date-table" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>تاریخ</th>
+                                    <th>مجموع فروش (ریال)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sales Chart -->
+                <div class="report-card chart-card">
+                    <h3>نمودار فروش بر اساس تاریخ</h3>
+                    <div class="chart-container">
+                        <canvas id="sales-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Stock History Filters and Table -->
+                <div class="report-card">
+                    <h3>تاریخچه موجودی</h3>
+                    <div class="stock-history-filters">
+                        <select id="history-product-id" class="form-control">
+                            <option value="">همه محصولات</option>
+                        </select>
+                        <select id="history-type-filter" class="form-control">
+                            <option value="">همه انواع</option>
+                            <option value="IN">ورود</option>
+                            <option value="OUT">خروج</option>
+                        </select>
+                        <input type="date" id="history-start-date" class="form-control" placeholder="از تاریخ">
+                        <input type="date" id="history-end-date" class="form-control" placeholder="تا تاریخ">
+                        <button class="btn btn-secondary" onclick="filterStockHistory()">فیلتر</button>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>محصول</th>
+                                    <th>نوع</th>
+                                    <th>تعداد</th>
+                                    <th>تاریخ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-history-list">
+                                <!-- Stock history rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
     <div id="product-modal" class="modal">
-        <div class="modal-content">
+            <div class="modal-content">
             <span class="close-btn" onclick="closeModal('product-modal')">&times;</span>
             <h2 id="product-modal-title">افزودن محصول جدید</h2>
             <form id="product-form">
@@ -155,47 +213,47 @@
                 <select id="product-category" required></select>
                 <button type="submit" class="btn btn-primary" id="save-product-btn">ذخیره</button>
                 <input type="hidden" id="product-id">
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-    
-    <div id="order-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('order-modal')">&times;</span>
-            <h2>ثبت سفارش جدید</h2>
-            <form id="order-form">
-                <div class="order-items-container">
-                    <h3>اقلام سفارش</h3>
-                    <div id="order-items-list"></div>
-                    <div class="add-item-row">
-                        <select id="add-order-product-select"></select>
-                        <input type="number" id="add-order-quantity" placeholder="تعداد" min="1" value="1">
-                        <button type="button" class="btn" onclick="addOrderItem()">+ اضافه کردن</button>
+
+        <div id="order-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('order-modal')">&times;</span>
+                <h2>ثبت سفارش جدید</h2>
+                <form id="order-form">
+                    <div class="order-items-container">
+                        <h3>اقلام سفارش</h3>
+                        <div id="order-items-list"></div>
+                        <div class="add-item-row">
+                            <select id="add-order-product-select"></select>
+                            <input type="number" id="add-order-quantity" placeholder="تعداد" min="1" value="1">
+                            <button type="button" class="btn" onclick="addOrderItem()">+ اضافه کردن</button>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary">ثبت سفارش</button>
-            </form>
+                    <button type="submit" class="btn btn-primary">ثبت سفارش</button>
+                </form>
+            </div>
         </div>
-    </div>
+        
+        <div id="low-stock-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('low-stock-modal')">&times;</span>
+                <h2>محصولات با موجودی کم</h2>
+                <ul id="low-stock-list"></ul>
+            </div>
+        </div>
+
+        <div id="order-detail-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('order-detail-modal')">&times;</span>
+                <h2 id="order-detail-title">جزئیات سفارش</h2>
+                <div id="order-detail-content"></div>
+                <button class="btn btn-danger" id="cancel-order-btn">لغو سفارش</button>
+            </div>
+        </div>
+
     
-    <div id="low-stock-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('low-stock-modal')">&times;</span>
-            <h2>محصولات با موجودی کم</h2>
-            <ul id="low-stock-list"></ul>
-        </div>
-    </div>
-
-    <div id="order-detail-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('order-detail-modal')">&times;</span>
-            <h2 id="order-detail-title">جزئیات سفارش</h2>
-            <div id="order-detail-content"></div>
-            <button class="btn btn-danger" id="cancel-order-btn">لغو سفارش</button>
-        </div>
-    </div>
-
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>

@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (pageId === 'orders') {
             fetchOrders();
         } else if (pageId === 'reports') {
-            renderSalesChart();
+            fetchSalesByProduct();
             fetchStockHistory();
         }
     }
@@ -193,54 +193,112 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderSalesChart() {
+    // Function to render the sales chart with dynamic data
+    const renderSalesChart = (data) => {
         const ctx = document.getElementById('sales-chart').getContext('2d');
+    
+        // Destroy the previous chart instance if it exists
         if (salesChart) {
             salesChart.destroy();
         }
 
-        const dailySales = {};
-        state.orders.forEach(order => {
-            if (order.status !== 'CANCELED') {
-                const date = new Date(order.date).toLocaleDateString('fa-IR');
-                dailySales[date] = (dailySales[date] || 0) + order.totalValue;
-            }
-        });
-
-        const labels = Object.keys(dailySales).reverse();
-        const data = Object.values(dailySales).reverse();
+        const labels = data.map(item => new Date(item.date).toLocaleDateString('fa-IR'));
+        const chartData = data.map(item => item.totalRevenue);
 
         salesChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'فروش روزانه (تومان)',
-                    data: data,
-                    backgroundColor: '#007bff',
+                    label: 'مجموع فروش (ریال)',
+                    data: chartData,
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'مبلغ فروش'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'تاریخ'
-                        }
+                        beginAtZero: true
                     }
                 }
             }
         });
-    }
+    };
+
+
+    const fetchSalesByProduct = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/reports/salesByProduct`);
+            const data = await response.json();
+            renderSalesByProductTable(data);
+        } catch (error) {
+            console.error('Error fetching sales by product report:', error);
+        }
+    };
+
+    const renderSalesByProductTable = (data) => {
+        const tableBody = document.querySelector('#sales-by-product-table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        if (data && data.length > 0) {
+            data.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.totalQuantity}</td>
+                        <td>${item.totalRevenue.toLocaleString('fa-IR')}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="3">اطلاعاتی یافت نشد.</td></tr>';
+        }
+    };
+
+    // Function to fetch and render the Sales Report by Date
+    window.fetchSalesByDate = async () => {
+        const startDate = document.getElementById('start-date-input').value;
+        const endDate = document.getElementById('end-date-input').value;
+
+        if (!startDate || !endDate) {
+            alert('لطفا هر دو تاریخ شروع و پایان را انتخاب کنید.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/reports/salesByDate?startDate=${startDate}&endDate=${endDate}`);
+            const data = await response.json();
+            renderSalesByDateTable(data);
+            renderSalesChart(data); // Render the chart with the new data
+        } catch (error) {
+            console.error('Error fetching sales by date report:', error);
+        }
+    };
+
+    const renderSalesByDateTable = (data) => {
+        const tableBody = document.querySelector('#sales-by-date-table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        if (data && data.length > 0) {
+            data.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${new Date(item.date).toLocaleDateString('fa-IR')}</td>
+                        <td>${item.totalRevenue.toLocaleString('fa-IR')}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="2">اطلاعاتی یافت نشد.</td></tr>';
+        }
+    };
+    document.getElementById('fetch-sales-by-product-btn').addEventListener('click', fetchSalesByProduct);
 
     // --- Modal Functions ---
 
