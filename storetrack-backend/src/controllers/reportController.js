@@ -1,6 +1,6 @@
 import prisma from '../prisma/prismaClient.js';
 
-
+// Sales by Product
 export const salesByProduct = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -9,6 +9,7 @@ export const salesByProduct = async (req, res) => {
       where: {
         order: {
           AND: [
+            { status: { not: 'CANCELED' } }, // exclude canceled orders
             startDate && { date: { gte: new Date(startDate) } },
             endDate && { date: { lte: new Date(endDate) } }
           ].filter(Boolean)
@@ -16,7 +17,6 @@ export const salesByProduct = async (req, res) => {
       },
       include: { product: true, order: true }
     });
-
 
     const productSalesMap = {};
     orderItems.forEach(item => {
@@ -40,6 +40,7 @@ export const salesByProduct = async (req, res) => {
   }
 };
 
+// Sales by Date
 export const salesByDate = async (req, res) => {
   try {
     const { startDate, endDate, groupBy = 'day' } = req.query;
@@ -48,19 +49,20 @@ export const salesByDate = async (req, res) => {
       return res.status(400).json({ error: 'groupBy must be day, month, or year' });
     }
 
-    // Build date filter
     const dateFilter = {};
     if (startDate) dateFilter.gte = new Date(startDate);
     if (endDate) dateFilter.lte = new Date(endDate);
 
     const orderItems = await prisma.orderItem.findMany({
       where: {
-        order: dateFilter.gte || dateFilter.lte ? { date: dateFilter } : undefined
+        order: {
+          AND: [
+            { status: { not: 'CANCELED' } }, // exclude canceled orders
+            Object.keys(dateFilter).length > 0 ? { date: dateFilter } : undefined
+          ].filter(Boolean)
+        }
       },
-      include: {
-        product: true,
-        order: true  // include order to access order.date
-      }
+      include: { product: true, order: true }
     });
 
     const salesMap = {};
@@ -68,11 +70,11 @@ export const salesByDate = async (req, res) => {
       const dateObj = new Date(item.order.date);
       let key;
       if (groupBy === 'day') {
-        key = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+        key = dateObj.toISOString().split('T')[0];
       } else if (groupBy === 'month') {
-        key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+        key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       } else {
-        key = `${dateObj.getFullYear()}`; // YYYY
+        key = `${dateObj.getFullYear()}`;
       }
 
       if (!salesMap[key]) {
@@ -89,7 +91,6 @@ export const salesByDate = async (req, res) => {
       totalRevenue: data.totalRevenue
     }));
 
-    // Sort chronologically
     salesReport.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     res.json(salesReport);
