@@ -10,16 +10,36 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const newProduct = await prisma.product.create({
-      data: { name, stock, price, categoryId, thruDate: null }
+    const result = await prisma.$transaction(async (tx) => {
+      const newProduct = await tx.product.create({
+        data: {
+          name,
+          stock,
+          price,
+          categoryId,
+          thruDate: null
+        }
+      });
+
+      await tx.stockHistory.create({
+        data: {
+          productId: newProduct.id,
+          quantity: stock,          
+          type: 'IN',            
+          date: new Date()
+        }
+      });
+
+      return newProduct;
     });
 
-    res.status(201).json(newProduct);
+    res.status(201).json(result);
   } catch (error) {
     console.error('Error creating product:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 // Get all active products
 export const getAllProducts = async (req, res) => {
@@ -101,15 +121,36 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// Search product
+// Search product (including child categories)
 export const searchProducts = async (req, res) => {
   try {
     const { name, categoryId, minPrice, maxPrice, isAvailable } = req.body;
     const filters = { AND: [{ thruDate: null }] };
 
-    if (name) filters.AND.push({ name: { contains: name, mode: 'insensitive' } });
-    if (categoryId) filters.AND.push({ categoryId: Number(categoryId) });
+    if (name) {
+      filters.AND.push({ name: { contains: name, mode: 'insensitive' } });
+    }
 
+    // Handle category + children
+    let categoryIds = [];
+    if (categoryId) {
+      const getAllChildCategoryIds = async (parentId) => {
+        const children = await prisma.category.findMany({
+          where: { parentId },
+          select: { id: true }
+        });
+        let ids = children.map(c => c.id);
+        for (let child of children) {
+          ids = ids.concat(await getAllChildCategoryIds(child.id));
+        }
+        return ids;
+      };
+
+      categoryIds = [Number(categoryId), ...(await getAllChildCategoryIds(Number(categoryId)))];
+      filters.AND.push({ categoryId: { in: categoryIds } });
+    }
+
+    // Price filters
     if (minPrice && maxPrice) {
       filters.AND.push({ price: { gte: Number(minPrice), lte: Number(maxPrice) } });
     } else if (minPrice) {
@@ -118,6 +159,7 @@ export const searchProducts = async (req, res) => {
       filters.AND.push({ price: { lte: Number(maxPrice) } });
     }
 
+    // Stock availability
     if (isAvailable === 'true') {
       filters.AND.push({ stock: { gt: 0 } });
     } else if (isAvailable === 'false') {
@@ -135,6 +177,7 @@ export const searchProducts = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 // Update stock
 export const updateStock = async (req, res) => {
@@ -166,5 +209,25 @@ export const expireProduct = async (req, res) => {
   } catch (error) {
     console.error('Error expiring product:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get all low stock products (under 100)
+export const getLowStockProducts = async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        stock: { lt: 100 },
+        thruDate: null // only active products
+      },
+      include: {
+        category: true
+      }
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching low stock products:', error);
+    res.status(500).json({ error: 'Failed to fetch low stock products' });
   }
 };

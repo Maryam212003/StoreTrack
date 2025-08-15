@@ -6,7 +6,8 @@ import {
   updateProduct,
   searchProducts,
   updateStock,
-  expireProduct
+  expireProduct, 
+  getLowStockProducts
 } from '../controllers/productController.js';
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.put('/update/:id', updateProduct);
 router.post('/searchProduct', searchProducts);
 router.patch('/:id/stock', updateStock);
 router.post('/:id/expire', expireProduct);
+router.get('/report/lowStock', getLowStockProducts);
 
 export default router;
