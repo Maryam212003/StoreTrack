@@ -68,11 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function fetchLowStockProducts() {
+        return await fetchData('/products/report/lowStock');
+    }
+
     async function fetchDashboardData() {
         // Fetch all data for stats and recent activity
         const products = await fetchData('/products/allProducts');
         const orders = await fetchData('/orders/getAll/');
-        const lowStockProducts = products.filter(p => p.stock <= 100); // Using the same threshold as backend
+        const lowStockProducts = await fetchLowStockProducts();
 
         document.getElementById('total-products').textContent = products.length;
         document.getElementById('total-orders').textContent = orders.length;
@@ -124,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         productsToRender.forEach(product => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>${product.id}</td>
                 <td>${product.name}</td>
                 <td>${product.category ? product.category.description : 'نامشخص'}</td>
                 <td>${product.stock}</td>
@@ -138,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCategories() {
-        const categorySelects = document.querySelectorAll('#product-category, #category-filter');
+        const categorySelects = document.querySelectorAll('#product-category, #category-filter, #add-product-modal #product-category');
 
         categorySelects.forEach(select => {
             select.innerHTML = '<option value="">همه دسته‌بندی‌ها</option>';
@@ -190,6 +195,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${history.quantity}</td>
             `;
             stockHistoryList.appendChild(tr);
+        });
+    }
+
+    const addProductForm = document.getElementById('add-product-form');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('add-product-form').querySelector('#product-name').value;
+            const categoryId = parseInt(document.getElementById('add-product-form').querySelector('#product-category').value);
+            const stock = parseInt(document.getElementById('add-product-form').querySelector('#product-stock').value);
+            const price = parseInt(document.getElementById('add-product-form').querySelector('#product-price').value);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/addNewProduct`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, stock, price, categoryId })
+                });
+
+                if (response.ok) {
+                    closeModal('add-product-modal');
+                    fetchProducts(); // Refresh the product list
+                    showMessage('محصول با موفقیت اضافه شد!');
+                } else {
+                    const error = await response.json();
+                    showMessage(`خطا در افزودن محصول: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Error creating product:', error);
+                showMessage('خطا در افزودن محصول.');
+            }
         });
     }
 
@@ -301,6 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('fetch-sales-by-product-btn').addEventListener('click', fetchSalesByProduct);
 
     // --- Modal Functions ---
+    window.showProductModal = () => {
+        const form = document.getElementById('add-product-form');
+        form.reset();
+        document.getElementById('add-product-modal').style.display = 'block';
+    }
 
     function showModal(modalId) {
         document.getElementById(modalId).style.display = 'block';
@@ -318,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Handlers (CRUD & Filtering) ---
 
-    // Product form submission
+    // Product form submission (for editing existing products)
     document.getElementById('product-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('product-id').value;
@@ -456,8 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // Low Stock Modal
-    window.showLowStockModal = () => {
-        const lowStockProducts = state.products.filter(p => p.stock <= 100);
+    window.showLowStockModal = async () => {
+        const lowStockProducts = await fetchLowStockProducts();
         const list = document.getElementById('low-stock-list');
         list.innerHTML = '';
         if (lowStockProducts.length === 0) {

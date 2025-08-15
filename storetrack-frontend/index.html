@@ -62,11 +62,12 @@
             <table class="data-table">
                     <thead>
                         <tr>
-                            <th>نام محصول</th>
+                        <th>شماره محصول</th>
+                        <th>نام محصول</th>
                         <th>دسته بندی</th>
-                            <th>موجودی</th>
+                        <th>موجودی</th>
                         <th>قیمت</th>
-                            <th>عملیات</th>
+                        <th>عملیات</th>
                         </tr>
                     </thead>
                 <tbody id="products-list"></tbody>
@@ -94,10 +95,10 @@
                         <tr>
                         <th>شناسه سفارش</th>
                         <th>تاریخ</th>
-                            <th>تعداد اقلام</th>
+                        <th>تعداد اقلام</th>
                         <th>مجموع مبلغ</th>
-                            <th>وضعیت</th>
-                            <th>عملیات</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
                         </tr>
                     </thead>
                 <tbody id="orders-list"></tbody>
@@ -107,7 +108,6 @@
         <section id="reports" class="page">
             <h2>گزارش‌ها</h2>
             <div class="reports-container">
-                <!-- Sales Report by Product -->
                 <div class="report-card mb-4">
                     <h3>گزارش فروش بر اساس محصول</h3>
                     <button id="fetch-sales-by-product-btn" class="btn btn-primary">دریافت گزارش</button>
@@ -121,13 +121,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Table rows will be populated by JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Sales Report by Date -->
                 <div class="report-card mb-4">
                     <h3>گزارش فروش بر اساس تاریخ</h3>
                     <div class="form-group">
@@ -148,13 +146,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Table rows will be populated by JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Sales Chart -->
                 <div class="report-card chart-card">
                     <h3>نمودار فروش بر اساس تاریخ</h3>
                     <div class="chart-container">
@@ -162,7 +158,6 @@
                     </div>
                 </div>
 
-                <!-- Stock History Filters and Table -->
                 <div class="report-card">
                     <h3>تاریخچه موجودی</h3>
                     <div class="stock-history-filters">
@@ -182,15 +177,14 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>محصول</th>
-                                    <th>نوع</th>
-                                    <th>تعداد</th>
                                     <th>تاریخ</th>
+                                    <th>شماره محصول</th>
+                                    <th>ورودی/خروجی</th>
+                                    <th>تعداد</th>
                                 </tr>
                             </thead>
                             <tbody id="stock-history-list">
-                                <!-- Stock history rows will be populated by JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -235,7 +229,32 @@
                 </form>
             </div>
         </div>
-        
+        <div id="add-product-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('add-product-modal')">&times;</span>
+                <h2>افزودن محصول جدید</h2>
+                <form id="add-product-form">
+                    <div class="form-group">
+                        <label for="product-name">نام محصول</label>
+                        <input type="text" id="product-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">دسته</label>
+                        <select id="product-category" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-stock">موجودی</label>
+                        <input type="number" id="product-stock" class="form-control" min="0" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">قیمت</label>
+                        <input type="number" id="product-price" class="form-control" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">ثبت محصول</button>
+                </form>
+            </div>
+        </div>
+
         <div id="low-stock-modal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeModal('low-stock-modal')">&times;</span>
