@@ -53,7 +53,7 @@
    cd backend
    ```
 
-### **Frontend Setup**
+### **2. Frontend Setup**
 
 #### - **Local Execution**
 1. Ensure all frontend files (`index.html`, `style.css`, `script.js`) are located in the same directory.
