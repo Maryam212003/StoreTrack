@@ -143,28 +143,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCategories() {
-        const categorySelects = document.querySelectorAll('#product-category, #category-filter, #add-product-modal #product-category');
+        const filterMenu = document.getElementById('category-filter-menu');
+        const productMenu = document.getElementById('product-category-menu');
+        
+        filterMenu.innerHTML = '';
+        productMenu.innerHTML = '';
 
-        categorySelects.forEach(select => {
-            select.innerHTML = '<option value="">همه دسته‌بندی‌ها</option>';
-            state.categories.forEach(category => {
-                appendCategoryOption(select, category);
-            });
+        const allOption = document.createElement('li');
+        allOption.textContent = 'همه دسته‌بندی‌ها';
+        allOption.dataset.value = '';
+        allOption.onclick = () => selectCategory('category-filter', 'همه دسته‌بندی‌ها', '');
+        filterMenu.appendChild(allOption);
+        
+        state.categories.forEach(category => {
+            appendCategoryItem(filterMenu, category);
+            appendCategoryItem(productMenu, category);
         });
     }
 
-    function appendCategoryOption(select, category, level = 0) {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = `${'— '.repeat(level)}${category.description}`;
-        select.appendChild(option);
+    function appendCategoryItem(parent, category, level = 0) {
+        const li = document.createElement('li');
+        li.className = `category-item level-${level}`;
+        li.dataset.value = category.id;
+        const indent = '\u00A0\u00A0'.repeat(level);
+        li.textContent = `${indent}${level > 0 ? ' ↵' : ''}${category.description}`;
+        li.onclick = () => selectCategory(parent.id.replace('-menu', ''), li.textContent, category.id);
+        parent.appendChild(li);
 
         if (category.children && category.children.length > 0) {
-            category.children.forEach(child => appendCategoryOption(select, child, level + 1));
+            category.children.forEach(child => appendCategoryItem(parent, child, level + 1));
         }
     }
 
-    
+    function selectCategory(dropdownId, text, value) {
+        const textSpan = document.getElementById(`selected-${dropdownId}-text`);
+        const hiddenInput = document.getElementById(`${dropdownId}-input`);
+
+        textSpan.textContent = text;
+        hiddenInput.value = value;
+        
+        toggleDropdown(`${dropdownId}-menu`);
+    }
+
+    function toggleDropdown(menuId) {
+        const menu = document.getElementById(menuId);
+        const header = menu.previousElementSibling;
+        
+        // Close all other open dropdowns
+        document.querySelectorAll('.custom-dropdown-menu.show').forEach(m => {
+            if (m.id !== menuId) {
+                m.classList.remove('show');
+                m.previousElementSibling.classList.remove('active');
+            }
+        });
+
+        menu.classList.toggle('show');
+        header.classList.toggle('active');
+    }
+
+    // Add event listener to close dropdowns when clicking outside
+    window.onclick = (event) => {
+        // Check if the click is outside any custom dropdown or modal
+        if (!event.target.closest('.custom-dropdown') && !event.target.closest('.modal')) {
+            document.querySelectorAll('.custom-dropdown-menu.show').forEach(m => {
+                m.classList.remove('show');
+                m.previousElementSibling.classList.remove('active');
+            });
+        }
+        // Also handle modal closing logic as before
+        if (event.target.classList.contains('modal')) {
+            closeModal(event.target.id);
+        }
+    };
+
+
     function renderOrders(ordersToRender = state.orders) {
         ordersList.innerHTML = '';
         ordersToRender.forEach(order => {
@@ -338,11 +390,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('fetch-sales-by-product-btn').addEventListener('click', fetchSalesByProduct);
 
     // --- Modal Functions ---
-    window.showProductModal = () => {
+    window.showProductModal = async () => {
+        // This function is for the `add-product-modal`
         const form = document.getElementById('add-product-form');
         form.reset();
         document.getElementById('add-product-modal').style.display = 'block';
-    }
+
+        const categories = await fetchData('/categories');
+        const select = document.getElementById('product-category');
+        select.innerHTML = '<option value="">انتخاب دسته‌بندی</option>';
+
+        function appendCategoryOption(category, level = 0) {
+            const option = document.createElement('option');
+            option.value = category.id;
+            const indent = '\u00A0\u00A0'.repeat(level);
+            option.textContent = `${indent}${level > 0 ? ' ↵' : ''}${category.description}`;
+            select.appendChild(option);
+
+            if (category.children && category.children.length > 0) {
+                category.children.forEach(child => appendCategoryOption(child, level + 1));
+            }
+        }
+
+        categories.forEach(category => {
+            appendCategoryOption(category);
+        });
+    };
 
     function showModal(modalId) {
         document.getElementById(modalId).style.display = 'block';
@@ -371,7 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
             name: document.getElementById('product-name').value,
             stock: parseInt(document.getElementById('product-stock').value),
             price: parseFloat(document.getElementById('product-price').value),
-            categoryId: parseInt(document.getElementById('product-category').value)
+            // Use the value from the hidden input
+            categoryId: parseInt(document.getElementById('product-category-input').value)
         };
 
         try {
@@ -391,13 +465,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Product filtering
     window.filterProducts = async () => {
         const name = document.getElementById('product-search').value;
-        const categoryId = document.getElementById('category-filter').value;
+        // Use the value from the hidden input
+        const categoryId = document.getElementById('category-filter-input').value;
         const url = new URL(`${API_BASE_URL}/products/searchProduct`);
 
         const filters = {};
         if (name) filters.name = name;
         if (categoryId) filters.categoryId = categoryId;
-        filters.isAvailable = 'true'; // Assuming we only want available products by default
+        filters.isAvailable = 'true';
 
         const response = await fetch(url, {
             method: 'POST',
@@ -417,8 +492,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('product-name').value = product.name;
         document.getElementById('product-stock').value = product.stock;
         document.getElementById('product-price').value = product.price;
-        document.getElementById('product-category').value = product.categoryId;
         document.getElementById('product-id').value = product.id;
+        
+        // Set the selected category in the custom dropdown
+        const selectedCategory = product.category ? product.category.description : 'نامشخص';
+        document.getElementById('selected-product-category-text').textContent = selectedCategory;
+        document.getElementById('product-category-input').value = product.categoryId;
+        
         showModal('product-modal');
     };
 
@@ -625,6 +705,14 @@ document.addEventListener('DOMContentLoaded', () => {
         SHIPPED: 'ارسال شده',
         CANCELED: 'لغو شده'
     };
+
+
+    document.getElementById('category-filter-header').addEventListener('click', () => {
+        toggleDropdown('category-filter-menu');
+    });
+    document.getElementById('product-category-header').addEventListener('click', () => {
+        toggleDropdown('product-category-menu');
+    });
 
     // Initial load
     showPage('dashboard');

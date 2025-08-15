@@ -54,9 +54,14 @@
             </div>
             <div class="filter-container">
                 <input type="text" id="product-search" placeholder="جستجو بر اساس نام محصول...">
-                <select id="category-filter">
-                    <option value="">همه دسته‌بندی‌ها</option>
-                </select>
+                <div class="custom-dropdown">
+                    <div id="category-filter-header" class="custom-dropdown-header">
+                        <span id="selected-category-filter-text">همه دسته‌بندی‌ها</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul id="category-filter-menu" class="custom-dropdown-menu"></ul>
+                </div>
+                <input type="hidden" id="category-filter-input">
                 <button class="btn" onclick="filterProducts()"><i class="fas fa-search"></i> جستجو</button>
             </div>
             <table class="data-table">
@@ -204,7 +209,17 @@
                 <label for="product-price">قیمت:</label>
                 <input type="number" id="product-price" step="0.01" required>
                 <label for="product-category">دسته بندی:</label>
-                <select id="product-category" required></select>
+                <div class="form-group">
+                    <label for="product-category-input">دسته</label>
+                    <div class="custom-dropdown">
+                        <div id="product-category-header" class="custom-dropdown-header">
+                            <span id="selected-product-category-text">انتخاب دسته‌بندی</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <ul id="product-category-menu" class="custom-dropdown-menu"></ul>
+                    </div>
+                    <input type="hidden" id="product-category-input" required>
+                </div>
                 <button type="submit" class="btn btn-primary" id="save-product-btn">ذخیره</button>
                 <input type="hidden" id="product-id">
                 </form>
