@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // API Base URL - Change this if your API runs on a different port
-    const API_BASE_URL = 'http://localhost:3000'; 
+    const API_BASE_URL = 'http://localhost:5000'; 
 
     const state = {
         currentPage: 'dashboard',
