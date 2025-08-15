@@ -46,12 +46,7 @@
    ```
   - The backend API will be accessible at http://localhost:3000.
 
-5. **Clone the repository**:
 
-   ```bash
-   git clone <repository-url>
-   cd backend
-   ```
 
 ### **2. Frontend Setup**
 
