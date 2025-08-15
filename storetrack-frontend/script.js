@@ -351,19 +351,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to fetch and render the Sales Report by Date
     window.fetchSalesByDate = async () => {
-        const startDate = document.getElementById('start-date-input').value;
-        const endDate = document.getElementById('end-date-input').value;
+        const startDateJalali = document.getElementById('start-date-input').value;
+        const endDateJalali = document.getElementById('end-date-input').value;
 
-        if (!startDate || !endDate) {
+        if (!startDateJalali || !endDateJalali) {
             alert('لطفا هر دو تاریخ شروع و پایان را انتخاب کنید.');
             return;
         }
 
+        const startDateGregorian = moment(startDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+        const endDateGregorian = moment(endDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+
         try {
-            const response = await fetch(`${API_BASE_URL}/reports/salesByDate?startDate=${startDate}&endDate=${endDate}`);
+            const response = await fetch(`${API_BASE_URL}/reports/salesByDate?startDate=${startDateGregorian}&endDate=${endDateGregorian}`);
             const data = await response.json();
             renderSalesByDateTable(data);
-            renderSalesChart(data); // Render the chart with the new data
+            renderSalesChart(data);
         } catch (error) {
             console.error('Error fetching sales by date report:', error);
         }
@@ -516,14 +519,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Order filtering
     window.filterOrders = async () => {
-        const startDate = document.getElementById('order-start-date').value;
-        const endDate = document.getElementById('order-end-date').value;
+        const startDateJalali = document.getElementById('order-start-date').value;
+        const endDateJalali = document.getElementById('order-end-date').value;
         const status = document.getElementById('order-status-filter').value;
-        
+
         const url = new URL(`${API_BASE_URL}/orders/search`);
         const filters = {};
-        if (startDate) filters.startDate = startDate;
-        if (endDate) filters.endDate = endDate;
+
+        // Convert Jalali dates to Gregorian for the backend
+        if (startDateJalali) {
+            filters.startDate = moment(startDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+        }
+        if (endDateJalali) {
+            filters.endDate = moment(endDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+        }
         if (status) filters.status = status;
 
         const response = await fetch(url, {
@@ -687,14 +696,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.filterStockHistory = async () => {
         const productId = document.getElementById('history-product-id').value;
         const type = document.getElementById('history-type-filter').value;
-        const startDate = document.getElementById('history-start-date').value;
-        const endDate = document.getElementById('history-end-date').value;
+        const startDateJalali = document.getElementById('history-start-date').value;
+        const endDateJalali = document.getElementById('history-end-date').value;
 
         const filters = {};
         if (productId) filters.productId = parseInt(productId);
         if (type) filters.type = type;
-        if (startDate) filters.startDate = startDate;
-        if (endDate) filters.endDate = endDate;
+
+        // Convert Jalali dates to Gregorian for the backend
+        if (startDateJalali) {
+            filters.startDate = moment(startDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+        }
+        if (endDateJalali) {
+            filters.endDate = moment(endDateJalali, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+        }
 
         await fetchStockHistory(filters);
     };
@@ -706,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
         CANCELED: 'لغو شده'
     };
 
-
+    jalaliDatepicker.startWatch();
     document.getElementById('category-filter-header').addEventListener('click', () => {
         toggleDropdown('category-filter-menu');
     });
