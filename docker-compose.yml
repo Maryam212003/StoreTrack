@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: storetrack-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: storetrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./storetrack-backend
+    container_name: storetrack-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./storetrack-backend/.env
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/storetrack
+    command: sh -c "npx prisma migrate deploy && node src/server.js"
+
+  frontend:
+    build: ./storetrack-frontend
+    container_name: storetrack-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
